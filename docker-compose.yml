@@ -1,0 +1,28 @@
+version: "3.0"
+services:
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgresql-vot
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: VOT
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-backend-vot
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: on-failure
+
+
+
+
+
