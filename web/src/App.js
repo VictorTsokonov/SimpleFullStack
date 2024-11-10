@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080"; // Default to localhost for local dev
+
+
 const App = () => {
   const [games, setGames] = useState([]);
   const [name, setName] = useState('');
@@ -9,7 +12,7 @@ const App = () => {
   // Fetch games from the backend
   const fetchGames = async () => {
     try {
-      let response = await axios.get('http://localhost:8080/game');
+      let response = await axios.get(`${API_URL}/game`);
       console.log(response)
       if(response?.data != null)setGames(response.data);
       if(response == null)setGames([])
@@ -24,7 +27,7 @@ const App = () => {
     if (!name || !releaseDate) return;
 
     try {
-      await axios.post('http://localhost:8080/game', {
+      await axios.post(`${API_URL}/game`, {
         name,
         release_date: parseInt(releaseDate, 10),
       });
@@ -39,7 +42,7 @@ const App = () => {
 
   const deleteGame = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/game?id=${id}`);
+      await axios.delete(`${API_URL}/game?id=${id}`);
 
       setGames((prevGames) => prevGames.filter((game) => game.id !== id));
 
