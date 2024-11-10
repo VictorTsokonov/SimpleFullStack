@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -65,13 +66,18 @@ func main() {
 	router := mux.NewRouter()
 
 	// Register routes
-	router.HandleFunc("/games", getGames).Methods("GET")
-	router.HandleFunc("/games", createGame).Methods("POST")
-	router.HandleFunc("/games", deleteGame).Methods("DELETE")
+	router.HandleFunc("/game", getGames).Methods("GET")
+	router.HandleFunc("/game", createGame).Methods("POST")
+	router.HandleFunc("/game", deleteGame).Methods("DELETE")
+
+	// Set up CORS options
+	corsOptions := handlers.AllowedOrigins([]string{"http://localhost:3000", "http://localhost:*", "*"})
+	corsHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
+	corsMethods := handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "OPTIONS"})
 
 	// Start the server
 	fmt.Println("Server is listening on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(corsOptions, corsHeaders, corsMethods)(router)))
 }
 
 // Handler for GET /games - Returns a list of games from the database
@@ -95,6 +101,7 @@ func getGames(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(games)
+
 	fmt.Println("GET /games: Returning list of games")
 }
 
