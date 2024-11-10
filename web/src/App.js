@@ -9,8 +9,11 @@ const App = () => {
   // Fetch games from the backend
   const fetchGames = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/game');
-      setGames(response.data);
+      let response = await axios.get('http://localhost:8080/game');
+      console.log(response)
+      if(response?.data != null)setGames(response.data);
+      if(response == null)setGames([])
+
     } catch (error) {
       console.error('Error fetching games:', error);
     }
@@ -23,27 +26,29 @@ const App = () => {
     try {
       await axios.post('http://localhost:8080/game', {
         name,
-        release_date: releaseDate,
+        release_date: parseInt(releaseDate, 10),
       });
       setName('');
       setReleaseDate('');
-      fetchGames(); // Refresh the game list
+      fetchGames();
     } catch (error) {
       console.error('Error adding game:', error);
     }
   };
 
-  // Delete a game
+
   const deleteGame = async (id) => {
     try {
       await axios.delete(`http://localhost:8080/game?id=${id}`);
-      fetchGames(); // Refresh the game list
+
+      setGames((prevGames) => prevGames.filter((game) => game.id !== id));
+
     } catch (error) {
       console.error('Error deleting game:', error);
     }
   };
 
-  // Fetch games on initial render
+
   useEffect(() => {
     fetchGames();
   }, []);
