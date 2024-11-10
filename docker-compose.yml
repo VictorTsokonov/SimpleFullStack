@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres
     restart: always
-    container_name: postgresql-vot
+    container_name: postgresql-database-vot
     ports:
       - "5432:5432"
     environment:
@@ -15,10 +15,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: go-backend-vot
+    container_name: golang-backend-vot
     ports:
       - "8080:8080"
     depends_on:
+      - postgres
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: react-frontend-vot
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://backend:8080
+    depends_on:
+      - backend
       - postgres
     restart: on-failure
 
